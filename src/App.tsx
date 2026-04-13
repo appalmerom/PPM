@@ -77,6 +77,13 @@ import { chatWithAgent } from './geminiService';
 import { toast } from 'sonner';
 import { Toaster } from '@/components/ui/sonner';
 
+const PREDEFINED_ANSWERS: Record<string, string> = {
+  "What is the status of Demand DMND001?": "Demand **DMND001 (Cloud Migration Phase 1)** is currently in the **Qualified** stage. It has a high priority and a budget of $250,000. All readiness checks (Business Case, Cost Inputs) are complete and it is ready for the next CAB review.",
+  "Which projects are at risk?": "There are currently **2 projects at risk**: <br/><br/>1. **Cybersecurity Hardening (PRJ003)** - Red Status (Budget Overrun & Resource Shortage)<br/>2. **HR System Upgrade (PRJ004)** - Red Status (Technical Dependency Issues)<br/><br/>Would you like me to generate a mitigation plan for either of these?",
+  "Summarize risks for PRJ003": "Project **PRJ003 (Cybersecurity Hardening)** is at critical risk due to:<br/>• **Budget**: 15% over allocated spend ($1.15M vs $1M).<br/>• **Resources**: Shortage of Senior Security Architects.<br/>• **Schedule**: Milestone 'Security Audit' is delayed by 14 days.<br/><br/>I recommend reallocating $50k from the 'Legacy Decommissioning' project to cover the gap.",
+  "Find the latest RAID log": "The latest **RAID Log** (Risk, Action, Issue, Decision) was updated on **May 10, 2024**. It is stored in SharePoint under the 'Governance Packs' folder. <br/><br/>**Current Summary:**<br/>• 12 Active Risks<br/>• 4 Open Issues<br/>• 8 Pending Decisions"
+};
+
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -105,13 +112,23 @@ export default function App() {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleSendMessage = async () => {
-    if (!chatInput.trim()) return;
+  const handleSendMessage = async (overrideMessage?: string) => {
+    const userMessage = overrideMessage || chatInput;
+    if (!userMessage.trim()) return;
 
-    const userMessage = chatInput;
     setChatInput('');
     setChatHistory(prev => [...prev, { role: 'user', parts: [{ text: userMessage }] }]);
     setIsTyping(true);
+
+    // Check for predefined answer first for instant response
+    if (PREDEFINED_ANSWERS[userMessage]) {
+      // Small delay to make it feel natural but still "instant"
+      setTimeout(() => {
+        setIsTyping(false);
+        setChatHistory(prev => [...prev, { role: 'model', parts: [{ text: PREDEFINED_ANSWERS[userMessage] }] }]);
+      }, 600);
+      return;
+    }
 
     const response = await chatWithAgent(userMessage, chatHistory);
     
@@ -277,7 +294,10 @@ export default function App() {
                       <p className="text-indigo-100 text-lg opacity-90">I can help you reallocate resources or generate a mitigation plan for the Cybersecurity Hardening project.</p>
                       <div className="flex flex-wrap gap-3 justify-center md:justify-start">
                         <Button 
-                          onClick={() => setIsChatOpen(true)}
+                          onClick={() => {
+                            setIsChatOpen(true);
+                            handleSendMessage("Which projects are at risk?");
+                          }}
                           className="bg-white text-indigo-700 hover:bg-indigo-50 font-bold rounded-xl px-6 h-12 gap-2 shadow-lg shadow-black/10"
                         >
                           <MessageSquare size={18} />
@@ -668,7 +688,7 @@ export default function App() {
                         ].map((prompt) => (
                           <button 
                             key={prompt.text}
-                            onClick={() => setChatInput(prompt.text)}
+                            onClick={() => handleSendMessage(prompt.text)}
                             className="text-left p-4 text-sm bg-white hover:bg-indigo-50 hover:border-indigo-200 rounded-2xl border border-slate-200 transition-all shadow-sm flex items-center gap-3 group"
                           >
                             <span className="p-1.5 bg-slate-50 group-hover:bg-white rounded-lg text-slate-400 group-hover:text-indigo-600 transition-colors">
