@@ -27,7 +27,8 @@ import {
   Plus,
   ArrowUpRight,
   ArrowDownRight,
-  Minus
+  Minus,
+  RotateCcw
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
@@ -649,14 +650,28 @@ export default function App() {
                     </div>
                   </div>
                 </div>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="text-white hover:bg-white/10 rounded-full h-8 w-8"
-                  onClick={() => setIsChatOpen(false)}
-                >
-                  <Minus size={20} />
-                </Button>
+                <div className="flex items-center gap-2 relative z-10">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="text-white hover:bg-white/10 rounded-full h-8 w-8"
+                    onClick={() => {
+                      setChatHistory([]);
+                      setChatInput('');
+                    }}
+                    title="Reset Chat"
+                  >
+                    <RotateCcw size={18} />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="text-white hover:bg-white/10 rounded-full h-8 w-8"
+                    onClick={() => setIsChatOpen(false)}
+                  >
+                    <Minus size={20} />
+                  </Button>
+                </div>
               </div>
 
               {/* Chat Messages */}
@@ -728,6 +743,26 @@ export default function App() {
                         <div className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce [animation-delay:0.4s]" />
                       </div>
                     </div>
+                  )}
+                  {chatHistory.length > 0 && !isTyping && (
+                    <motion.div 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="flex justify-center pt-4"
+                    >
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => {
+                          setChatHistory([]);
+                          setChatInput('');
+                        }}
+                        className="rounded-full bg-white border-indigo-100 text-indigo-600 hover:bg-indigo-50 gap-2 shadow-sm"
+                      >
+                        <RotateCcw size={14} />
+                        Start New Conversation
+                      </Button>
+                    </motion.div>
                   )}
                 </div>
               </ScrollArea>
