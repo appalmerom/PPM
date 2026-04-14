@@ -28,7 +28,10 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Minus,
-  RotateCcw
+  RotateCcw,
+  Bot,
+  Cpu,
+  Sparkles
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
@@ -313,23 +316,49 @@ export default function App() {
                       </div>
                     </div>
                     
-                    <div className="hidden lg:block relative">
-                      <div className="w-48 h-48 bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 flex items-center justify-center rotate-3 hover:rotate-0 transition-transform duration-500 shadow-2xl">
-                        <div className="text-center space-y-2">
-                          <div className="text-4xl font-bold">84%</div>
-                          <div className="text-[10px] font-bold uppercase tracking-widest opacity-70">Health Score</div>
-                          <div className="w-32 h-1.5 bg-white/20 rounded-full mx-auto overflow-hidden">
-                            <motion.div 
-                              initial={{ width: 0 }}
-                              animate={{ width: '84%' }}
-                              transition={{ duration: 1.5, delay: 0.5 }}
-                              className="h-full bg-emerald-400"
-                            />
+                    <div className="hidden lg:flex items-center gap-6 relative">
+                      {/* AI Agent Visual */}
+                      <div className="relative">
+                        <motion.div 
+                          animate={{ 
+                            y: [0, -10, 0],
+                            rotate: [3, -3, 3]
+                          }}
+                          transition={{ 
+                            duration: 5, 
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                          }}
+                          className="w-48 h-48 bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 flex items-center justify-center shadow-2xl relative z-10 overflow-hidden"
+                        >
+                          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-violet-500/20" />
+                          <div className="relative z-20 flex flex-col items-center gap-2">
+                            <div className="p-4 bg-white/20 rounded-2xl backdrop-blur-md border border-white/30 shadow-inner">
+                              <Bot size={64} className="text-white" />
+                            </div>
+                            <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-500/20 rounded-full border border-emerald-500/30">
+                              <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+                              <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-100">Active</span>
+                            </div>
                           </div>
-                        </div>
-                      </div>
-                      <div className="absolute -top-4 -right-4 w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-lg animate-bounce">
-                        <TrendingUp size={24} className="text-white" />
+                          
+                          {/* Decorative elements */}
+                          <Sparkles className="absolute top-4 right-4 text-indigo-300 opacity-50" size={20} />
+                          <Cpu className="absolute bottom-4 left-4 text-violet-300 opacity-50" size={20} />
+                        </motion.div>
+                        
+                        {/* Health Score Overlay */}
+                        <motion.div 
+                          initial={{ scale: 0, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          transition={{ delay: 1, type: 'spring' }}
+                          className="absolute -bottom-4 -right-4 bg-white rounded-2xl p-4 shadow-xl border border-indigo-50 text-indigo-900 z-20"
+                        >
+                          <div className="text-center space-y-1">
+                            <div className="text-2xl font-bold">84%</div>
+                            <div className="text-[8px] font-bold uppercase tracking-widest text-slate-400">Health</div>
+                          </div>
+                        </motion.div>
                       </div>
                     </div>
                   </div>
